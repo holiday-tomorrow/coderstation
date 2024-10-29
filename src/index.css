@@ -6,7 +6,7 @@
 @font-face {
     font-family: "iconfont";
     /* Project id  */
-    /* src: url('./fonts/iconfont.ttf?t=1666762429301') format('truetype'); */
+    src: url('./fonts/iconfont.ttf?t=1666762429301') format('truetype');
 }
 
 .iconfont {

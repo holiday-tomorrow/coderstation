@@ -5,13 +5,16 @@ const service = axios.create({
 })
 // 请求拦截
 service.interceptors.request.use(config => {
-    return config  
+    let token = localStorage.getItem('userToken')
+    if (token) {
+        config.headers['Authorization'] = "Bearer " + token
+    }
+    return config
 }, err => {
     console.log('请求拦截', err)
 })
 // 响应拦截
 service.interceptors.response.use(res => {
-    console.log(res,'res');
     return res.data
 }, err => {
     console.log('响应拦截', err)

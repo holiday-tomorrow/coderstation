@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Modal, Radio, Form, Button, Input, Row, Col, Checkbox, message } from 'antd'
 import styles from '../css/LoginForm.module.css'
-import { getCaptcha, userIsExist, addUser } from '../api/user'
+import { getCaptcha, userIsExist, addUser, userLogin, getUserById } from '../api/user'
 import { initUserInfo, loginStateChange } from '../redux/userSlice'
 import { useDispatch } from 'react-redux'
 export default function LoginForm(props) {
@@ -33,7 +33,32 @@ export default function LoginForm(props) {
     }
     // 登录相关
     let loginHandle = () => {
-
+        userLogin(loginInfo).then(res => {
+            let data = res.data
+            console.log(data, 'data');
+            if (data) {
+                if (!data.data) {
+                    message.error("账号或密码不正确")
+                    captchaClickHandle();
+                } else if (!data.data.enabled) {
+                    message.error("该账号已被禁用")
+                    captchaClickHandle();
+                } else {
+                    localStorage.setItem("userToken", data.token)
+                    getUserById(data.data._id).then(res => {
+                        if (res.data) {
+                            message.success("登录成功");
+                            dispatch(initUserInfo(res.data))
+                            dispatch(loginStateChange(true))
+                            handleCancel()
+                        }
+                    })
+                }
+            } else {
+                message.warn(res.msg)
+                captchaClickHandle();
+            }
+        })
     }
     let updateInfo = (obj, value, key, setValue) => {
         let newObj = { ...obj }
@@ -59,7 +84,8 @@ export default function LoginForm(props) {
                 dispatch(loginStateChange(true))
                 handleCancel()
             } else {
-                message.success(res.msg)
+                captchaClickHandle()
+                message.warn(res.msg)
             }
         })
     }
